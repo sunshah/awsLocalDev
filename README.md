@@ -8,6 +8,14 @@ The `KinesisInputDStream` builder does not give you the option to point to a loc
 The Shard Reader is hard-coded to update aws's prod instance. To get around this problem we've setup a 
 reverse proxy to capture outgoing calls to prod server and redirect them to a local DynamoDB instance. We do the same for
 Cloudwatch
+
+#### Kinesis Producer
+The kinesis producer uses the KCL to create a new stream if it does not exist and publish messages to kinesis with the 
+following message format
+`<messageId>@@@<totalParts>@@@<currentPart>@@@<payload>`
+
+#### Kinesis Consumer
+The kinesis consumer sets up shard consumers using Spark structured streaming and prints records to the console 
  
 ### Local Development
 Update hosts file to redirect outgoing aws requests to loopback interface on which localstack is setup
@@ -25,6 +33,17 @@ Ensure one of the credentials is provided. This is required by the Kinesis clien
 Localstack does not perform any authentication
 
 ## Appendix
+
+### Debugging commands
+
+#### Kinesis 
+* `aws --region= --endpoint-url=https://localhost:4568 kinesis list-streams --no-verify-ssl`
+* `aws --region= --endpoint-url=https://localhost:4568 kinesis describe-stream --stream-name iterable-ds-events-stream --no-verify-ssl`
+* `aws --region= --endpoint-url=https://localhost:4568 kinesis get-shard-iterator --shard-id <shardId-> --shard-iterator-type TRIM_HORIZON --stream-name iterable-ds-events-stream --query 'ShardIterator' --no-verify-ssl`
+* `aws --region= --endpoint-url=https://localhost:4568 kinesis get-records --shard-iterator <iterator_from_previous_command>  --no-verify-ssl`
+
+#### DynamoDB
+* `aws dynamodb list-tables --endpoint-url=https://localhost:4569 --no-verify-ssl --debug`
 
 ### Generating self signed certs
 
