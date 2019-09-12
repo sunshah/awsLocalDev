@@ -1,6 +1,8 @@
 ### Kinesis Producer-Consumer Local Dev and Testing
-This app sets up a local kinesis instance using [localstack](https://github.com/localstack/localstack). It also sets up 
-local instances of DynamoDB and Cloudwatch. 
+
+This app lets you test code to produce and consume from a kinesis stream by setting up local instances of kinesis, dynamoDB
+ and CloudWatch using [localstack](https://github.com/localstack/localstack). It also sets up an nginx reverse proxy
+ required to redirect outgoing http requests to aws. 
 
 The `KinesisInputDStream` builder does not give you the option to point to a local instance of DynamoDB.
 The Shard Reader is hard-coded to update aws's prod instance. To get around this problem we've setup a 
@@ -8,7 +10,7 @@ reverse proxy to capture outgoing calls to prod server and redirect them to a lo
 Cloudwatch
  
 ### Local Development
-Update hosts file to redirect outgoing aws requests to localstack instances
+Update hosts file to redirect outgoing aws requests to loopback interface on which localstack is setup
 * Add the following entry to your `/etc/hosts` file
 ```
 127.0.0.1 dynamodb.us-east-1.amazonaws.com
