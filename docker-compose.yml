@@ -1,0 +1,42 @@
+version: '2.1'
+
+services:
+  nginx:
+    depends_on:
+      - localstack
+    image: nginx:latest
+    container_name: reverse_proxy
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/certs
+    ports:
+      - 80:80
+      - 443:8001
+
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    hostname: localstack
+    ports:
+      - 4567:4567
+      - 4568:4568
+      - 4569:4569
+      - 4582:4582
+    environment:
+      - SERVICES=kinesis,dynamodb,cloudwatch
+      - DEBUG=${DEBUG- }
+      - DATA_DIR=${DATA_DIR- }
+      - PORT_WEB_UI=${PORT_WEB_UI- }
+      - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR- }
+      - KINESIS_ERROR_PROBABILITY=${KINESIS_ERROR_PROBABILITY- }
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - AWS_ACCESS_KEY_ID=dev
+      - AWS_SECRET_ACCESS_KEY=dev
+      - DEFAULT_REGION=us-east-1
+      - AWS_CBOR_DISABLE=true
+      - USE_SSL=true
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+
